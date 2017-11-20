@@ -1,0 +1,98 @@
+[
+    {
+        "id": "f3905a28.4a0e2",
+        "type": "tab",
+        "label": "test papa"
+    },
+    {
+        "id": "d2a62efa.bf739",
+        "type": "xml",
+        "z": "f3905a28.4a0e2",
+        "name": "",
+        "attr": "",
+        "chr": "",
+        "x": 630,
+        "y": 120,
+        "wires": [
+            [
+                "823637fc.d90ac8"
+            ]
+        ]
+    },
+    {
+        "id": "55c10ecc.79828",
+        "type": "http request",
+        "z": "f3905a28.4a0e2",
+        "name": "",
+        "method": "GET",
+        "ret": "txt",
+        "url": "http://10.0.1.10/aaa.xml",
+        "tls": "",
+        "x": 270,
+        "y": 120,
+        "wires": [
+            [
+                "108d5001.e40c6"
+            ]
+        ]
+    },
+    {
+        "id": "acf61240.c99fe",
+        "type": "comment",
+        "z": "f3905a28.4a0e2",
+        "name": "test CometSystem",
+        "info": "",
+        "x": 160,
+        "y": 60,
+        "wires": []
+    },
+    {
+        "id": "f279df99.21da2",
+        "type": "inject",
+        "z": "f3905a28.4a0e2",
+        "name": "",
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "x": 100,
+        "y": 120,
+        "wires": [
+            [
+                "55c10ecc.79828"
+            ]
+        ]
+    },
+    {
+        "id": "823637fc.d90ac8",
+        "type": "function",
+        "z": "f3905a28.4a0e2",
+        "name": "Decode and HTTP post",
+        "func": "// Content Type for post form-data\nmsg.headers = {'content-type':'application/x-www-form-urlencoded'};\n\n// GET TIME\nconst date = new Date();\nconst timeStamp = date.getTime();\n\n// Parse XML to get infos\ngetInfo = msg.payload[\"soap:Envelope\"][\"soap:Body\"][0][\"InsertTx5xxCO2Sample\"][0];\n\nvar id = getInfo[\"passKey\"][0] ;\nvar temp = getInfo[\"temp\"][0];\nvar hum = getInfo[\"relHum\"][0];\nvar co2 = getInfo[\"co2\"][0];\n\nmsg.payload = \"__device=\"+id+\"&__time=\"+timeStamp;\nmsg.payload += \"&temp=\"+temp+\"&hum=\"+hum+\"&co2=\"+co2;\n\ndelete msg.statusCode;\ndelete msg.responseUrl;\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 810,
+        "y": 120,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "108d5001.e40c6",
+        "type": "function",
+        "z": "f3905a28.4a0e2",
+        "name": "keep only XML",
+        "func": "var str = msg.payload\nmsg.payload = str.substring(str.indexOf(\"<?xml\"));\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 460,
+        "y": 120,
+        "wires": [
+            [
+                "d2a62efa.bf739"
+            ]
+        ]
+    }
+]
